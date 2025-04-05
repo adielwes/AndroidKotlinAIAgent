@@ -18,7 +18,8 @@ package com.wesleyadiel.aiagent
 fun main() {
     val apiKey = BuildConfig.GEMINI_API_KEY
     val llm = GeminiClient(apiKey)
-    val agent = Agent(llm)
+    val memoryManager = MemoryManager()
+    val agent = Agent(llm, memoryManager)
 
     println("Welcome! Say something or type 'bye' any time to leave the chat.\n")
 

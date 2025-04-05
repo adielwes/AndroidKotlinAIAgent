@@ -15,6 +15,7 @@
  */
 package com.wesleyadiel.aiagent.model
 
-data class GeminiRequest(
-    val contents: List<Message>,
+data class Message(
+    val role: String,
+    val parts: List<Part>,
 )

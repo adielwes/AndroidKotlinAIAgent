@@ -15,16 +15,83 @@
  */
 package com.wesleyadiel.aiagent
 
-class Agent(private val llm: GeminiClient) {
+import com.wesleyadiel.aiagent.model.MemoryEntry
+import java.util.Locale
+
+class Agent(private val llm: GeminiClient, private val memoryManager: MemoryManager) {
+    private val history = memoryManager.loadMemory()
+
     fun handleInput(input: String) {
         println("User: $input")
 
-        val response =
-            llm.ask(
-                "You're a personal assistant. User said: \"$input\". " +
-                    "Answer something useful. Be kind but also be straightforward.",
+        // if (answerBasedOnMemoryAndCategory(input)) return
+
+        val category = classifyText(input)
+        println("- Detected category: $category")
+
+        println("History size: ${history.size}")
+
+        val response = llm.askWithMemory(history, input)
+        println("Agent: $response")
+
+        history.add(MemoryEntry(input, response, category))
+
+        if (history.size > 20) {
+            history.removeAt(0)
+        }
+
+        memoryManager.saveMemory(history)
+    }
+
+    private fun answerBasedOnMemoryAndCategory(input: String): Boolean {
+        val requestedCategory = detectRequestedCategory(input)
+        if (requestedCategory != null) {
+            val results = memoryManager.searchByCategory(requestedCategory)
+
+            if (results.isEmpty()) {
+                println("Agent: I did not find anything about $requestedCategory.")
+            } else {
+                println("Agent: Here's what I found in the category '$requestedCategory':")
+                results.forEach {
+                    println("- ${it.user}")
+                }
+            }
+
+            return true
+        }
+        return false
+    }
+
+    private fun detectRequestedCategory(input: String): String? {
+        val map =
+            mapOf(
+                "tasks" to "Task",
+                "my tasks" to "Task",
+                "reminders" to "Reminder",
+                "Can you remember" to "Reminder",
+                "ideas" to "Idea",
+                "my idea" to "Idea",
+                "feelings" to "Feeling",
+                "How I'm feeling" to "Feeling",
             )
 
-        println("Agent: $response")
+        return map.entries.firstOrNull { (key, _) ->
+            input.contains(key, ignoreCase = true)
+        }?.value
+    }
+
+    fun classifyText(text: String): String {
+        val prompt =
+            """
+            Classify the following tex in one of the categories: Task, Reminder, Idea, Feeling or Other.
+            Text: "$text"
+            Return just the exact category, without explanations.
+            """.trimIndent()
+
+        val resposta = llm.askWithMemory(emptyList(), prompt)
+        return resposta.replace(Regex("[^\\w]"), "")
+            .replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+            }
     }
 }

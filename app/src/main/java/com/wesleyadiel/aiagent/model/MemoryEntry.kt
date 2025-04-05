@@ -15,6 +15,8 @@
  */
 package com.wesleyadiel.aiagent.model
 
-data class GeminiRequest(
-    val contents: List<Message>,
+data class MemoryEntry(
+    val user: String,
+    val assistant: String,
+    val category: String,
 )

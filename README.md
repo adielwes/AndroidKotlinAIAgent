@@ -22,14 +22,29 @@ uses an LLM to interpret commands, and returns smart responses.
 
 ## 🚀 Features in this version
 
-- Interaction via command line
-- Integration with **Gemini 2.0 Flash model** from Google's API
-- Natural language interpretation and response
+- 🧠 Natural language understanding using Gemini LLM
+- 💬 Interactive command-line conversation with the agent
+- 🗂️ Categorization of user input into:
+    - `Task`
+    - `Reminder`
+    - `Idea`
+    - `Feeling`
+    - `Other`
+- 💾 Message history saved locally to a JSON file
+- 🔁 Restores conversation history across sessions
+
+## 🧠 How it works
+
+Each time the user sends a message, the agent:
+
+1. Sends the message to the Gemini LLM to generate a contextual response
+2. Uses the LLM to classify the message into a category: Task, Reminder, Idea, Feeling, or Other
+3. Saves both the user input and the assistant response, along with the category, in a local JSON file
+4. Loads the message history on startup to maintain memory across sessions
 
 ⚠️ This version does **not yet** include:
 
 - User interface (UI)
-- Conversation memory or history
 - External tool integrations (e.g. Google Calendar)
 
 ---
@@ -57,8 +72,6 @@ Use IntelliJ/Android Studio to run the main() function in Main.kt.
 
 ## 📌 Next steps
 
-- Add conversation memory
-- Classify messages by type (task, idea, reminder, etc.)
 - Integrate with Google Calendar
 - Local notification support
 - Jetpack Compose UI

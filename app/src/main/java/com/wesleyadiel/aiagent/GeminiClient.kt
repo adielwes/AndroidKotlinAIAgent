@@ -16,9 +16,10 @@
 package com.wesleyadiel.aiagent
 
 import com.google.gson.Gson
-import com.wesleyadiel.aiagent.model.Content
 import com.wesleyadiel.aiagent.model.GeminiRequest
 import com.wesleyadiel.aiagent.model.GeminiResponse
+import com.wesleyadiel.aiagent.model.MemoryEntry
+import com.wesleyadiel.aiagent.model.Message
 import com.wesleyadiel.aiagent.model.Part
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -31,18 +32,23 @@ class GeminiClient(private val apiKey: String) {
     private val endpoint =
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey"
 
-    fun ask(prompt: String): String {
-        val requestBody =
-            GeminiRequest(
-                contents =
-                    listOf(
-                        Content(
-                            parts = listOf(Part(prompt)),
-                        ),
-                    ),
-            )
+    fun askWithMemory(
+        history: List<MemoryEntry>,
+        userInput: String,
+    ): String {
+        val allMessages =
+            history.flatMap { (user, assistant) ->
+                listOf(
+                    Message(role = "user", parts = listOf(Part(user))),
+                    Message(role = "model", parts = listOf(Part(assistant))),
+                )
+            }.toMutableList()
 
-        val json = gson.toJson(requestBody)
+        allMessages.add(Message(role = "user", parts = listOf(Part(userInput))))
+
+        val requestBodyObj = GeminiRequest(contents = allMessages)
+        val json = gson.toJson(requestBodyObj)
+
         val body = json.toRequestBody("application/json".toMediaTypeOrNull())
 
         val request =
@@ -52,17 +58,17 @@ class GeminiClient(private val apiKey: String) {
                 .build()
 
         client.newCall(request).execute().use { response ->
-            val responseBody = response.body?.string() ?: return "error: empty response"
-            val geminiResponse = gson.fromJson(responseBody, GeminiResponse::class.java)
+            val responseBody = response.body?.string() ?: return "Error: empty response"
+            val responseJson = gson.fromJson(responseBody, GeminiResponse::class.java)
 
-            return geminiResponse
+            return responseJson
                 ?.candidates
                 ?.firstOrNull()
                 ?.content
                 ?.parts
                 ?.firstOrNull()
                 ?.text
-                ?: "Couldn't understand the response."
+                ?: "Couldn't understand the request."
         }
     }
 }
