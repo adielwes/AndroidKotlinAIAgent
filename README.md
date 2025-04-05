@@ -30,22 +30,30 @@ uses an LLM to interpret commands, and returns smart responses.
     - `Idea`
     - `Feeling`
     - `Other`
-- 💾 Message history saved locally to a JSON file
-- 🔁 Restores conversation history across sessions
+- 💾 Persistent memory: message history saved and restored across sessions
+- ⏳ Time detection: extracts and stores deadlines from user messages  
+  (e.g. "next Monday", "in 2 hours", "tomorrow at 3pm")
 
 ## 🧠 How it works
 
-Each time the user sends a message, the agent:
+Each time the user sends a message, the agent goes through the following steps:
+1. Parses the input using the Gemini LLM to generate a contextual response
+2. Classifies the user message into one of the categories:
+`Task`, `Reminder`, `Idea`, `Feeling`, or `Other`
+3. Detects natural language time expressions, such as:
+`"tomorrow at 3pm"`, `"next Monday"`, `"in 2 hours"`, and stores them as a deadline
+4. Stores the interaction as a memory entry in a local JSON file, including:
+- User input
+- Agent response
+- Category
+- Optional deadline (if applicable)
+5. Loads all previous memory entries on startup, allowing the agent to retain context across
+sessions and eventually act on saved information.
 
-1. Sends the message to the Gemini LLM to generate a contextual response
-2. Uses the LLM to classify the message into a category: Task, Reminder, Idea, Feeling, or Other
-3. Saves both the user input and the assistant response, along with the category, in a local JSON file
-4. Loads the message history on startup to maintain memory across sessions
-
-⚠️ This version does **not yet** include:
-
-- User interface (UI)
-- External tool integrations (e.g. Google Calendar)
+This evolving memory system makes it possible for the agent to:
+- Answer follow-up questions like “Did I already tell you about my meeting?”
+- Search past messages by category or deadline
+- Prepare for integrations with tools like Google Calendar and notification systems
 
 ---
 
@@ -69,6 +77,8 @@ GEMINI_API_KEY=your_api_key_here
 ```
 Use IntelliJ/Android Studio to run the main() function in Main.kt.
 ```
+
+---
 
 ## 📌 Next steps
 

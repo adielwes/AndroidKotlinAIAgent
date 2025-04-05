@@ -29,12 +29,17 @@ class Agent(private val llm: GeminiClient, private val memoryManager: MemoryMana
         val category = classifyText(input)
         println("- Detected category: $category")
 
+        val deadline = if (category == "Task" || category == "Reminder")
+            extractData(input) else null
+        if (deadline != null)
+            println("- Detected deadline: $deadline")
+
         println("History size: ${history.size}")
 
         val response = llm.askWithMemory(history, input)
         println("Agent: $response")
 
-        history.add(MemoryEntry(input, response, category))
+        history.add(MemoryEntry(input, response, category, deadline))
 
         if (history.size > 20) {
             history.removeAt(0)
@@ -93,5 +98,17 @@ class Agent(private val llm: GeminiClient, private val memoryManager: MemoryMana
             .replaceFirstChar {
                 if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
             }
+    }
+
+    fun extractData(text: String): String? {
+        val prompt =
+            """
+            Extract any data and hour from the following text: "$text".
+            Return just data/hour in a clear and precise manner.
+            If there is not any, answer "nothing".
+            """.trimIndent()
+
+        val response = llm.askWithMemory(emptyList(), prompt)
+        return if (response.contains("nothing", ignoreCase = true)) null else response.trim()
     }
 }

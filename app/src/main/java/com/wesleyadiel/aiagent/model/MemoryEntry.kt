@@ -19,4 +19,5 @@ data class MemoryEntry(
     val user: String,
     val assistant: String,
     val category: String,
+    val deadline: String? = null
 )
