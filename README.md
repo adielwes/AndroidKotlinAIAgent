@@ -33,6 +33,13 @@ uses an LLM to interpret commands, and returns smart responses.
 - 💾 Persistent memory: message history saved and restored across sessions
 - ⏳ Time detection: extracts and stores deadlines from user messages  
   (e.g. "next Monday", "in 2 hours", "tomorrow at 3pm")
+- 📱 **Modern UI built with Jetpack Compose**
+    - Material 3 design
+    - Scrollable message list with auto-scroll
+    - TopAppBar and proper keyboard handling
+- 🔄 Future-ready for:
+    - Google Calendar integration
+    - Local notifications
 
 ## 🧠 How it works
 
@@ -68,15 +75,34 @@ This evolving memory system makes it possible for the agent to:
 
 ## ▶️ How to run
 
-1. Create a file named `apikeys.properties` in the root directory with your Gemini API key:
+1. Make sure you have a valid [Gemini API key](https://makersuite.google.com/app)
+2. Create a file named `apikeys.properties` in the root directory with your Gemini API key:
 ```
 GEMINI_API_KEY=your_api_key_here
 ```
 
-2. Run the application:
-```
-Use IntelliJ/Android Studio to run the main() function in Main.kt.
-```
+3. Run the app in Android Studio on a device or emulator with:
+
+- `Run > Run 'app'`
+- Or click the green ▶️ next to `MainActivity`
+
+---
+
+## 🛠️ Tech Stack
+
+- Kotlin (JVM)
+- Jetpack Compose (Material 3)
+- OkHttp for networking
+- Gson for JSON serialization
+- Kotlin Coroutines for asynchronous operations
+- Android internal storage for local memory
+
+---
+
+## 📌 Tag version
+
+This version is tagged as: `v0.2-compose-ui`
+> First version with Jetpack Compose UI replacing the previous console-based interface.
 
 ---
 
@@ -84,4 +110,9 @@ Use IntelliJ/Android Studio to run the main() function in Main.kt.
 
 - Integrate with Google Calendar
 - Local notification support
-- Jetpack Compose UI
+
+---
+
+## 📄 License
+
+Licensed under the [Apache 2.0 License](LICENSE)

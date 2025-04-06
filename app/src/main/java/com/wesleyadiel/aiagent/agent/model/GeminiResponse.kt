@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wesleyadiel.aiagent.model
+package com.wesleyadiel.aiagent.agent.model
 
-data class Message(
-    val role: String,
-    val parts: List<Part>,
+data class GeminiResponse(
+    val candidates: List<Candidate>?,
 )

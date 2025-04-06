@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wesleyadiel.aiagent
+package com.wesleyadiel.aiagent.agent
 
-import com.wesleyadiel.aiagent.model.MemoryEntry
+import com.wesleyadiel.aiagent.data.MemoryEntry
+import com.wesleyadiel.aiagent.data.MemoryManager
 import java.util.Locale
 
 class Agent(private val llm: GeminiClient, private val memoryManager: MemoryManager) {
     private val history = memoryManager.loadMemory()
 
-    fun handleInput(input: String) {
+    suspend fun handleInput(input: String): String {
         println("User: $input")
 
         // if (answerBasedOnMemoryAndCategory(input)) return
@@ -29,10 +30,15 @@ class Agent(private val llm: GeminiClient, private val memoryManager: MemoryMana
         val category = classifyText(input)
         println("- Detected category: $category")
 
-        val deadline = if (category == "Task" || category == "Reminder")
-            extractData(input) else null
-        if (deadline != null)
+        val deadline =
+            if (category == "Task" || category == "Reminder") {
+                extractData(input)
+            } else {
+                null
+            }
+        if (deadline != null) {
             println("- Detected deadline: $deadline")
+        }
 
         println("History size: ${history.size}")
 
@@ -46,6 +52,7 @@ class Agent(private val llm: GeminiClient, private val memoryManager: MemoryMana
         }
 
         memoryManager.saveMemory(history)
+        return response
     }
 
     private fun answerBasedOnMemoryAndCategory(input: String): Boolean {
@@ -85,7 +92,7 @@ class Agent(private val llm: GeminiClient, private val memoryManager: MemoryMana
         }?.value
     }
 
-    fun classifyText(text: String): String {
+    private suspend fun classifyText(text: String): String {
         val prompt =
             """
             Classify the following tex in one of the categories: Task, Reminder, Idea, Feeling or Other.
@@ -100,7 +107,7 @@ class Agent(private val llm: GeminiClient, private val memoryManager: MemoryMana
             }
     }
 
-    fun extractData(text: String): String? {
+    private suspend fun extractData(text: String): String? {
         val prompt =
             """
             Extract any data and hour from the following text: "$text".
