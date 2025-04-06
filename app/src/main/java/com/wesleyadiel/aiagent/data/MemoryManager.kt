@@ -13,18 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wesleyadiel.aiagent
+package com.wesleyadiel.aiagent.data
 
+import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.wesleyadiel.aiagent.model.MemoryEntry
 import java.io.File
 
-class MemoryManager(private val filePath: String = "memory.json") {
+class MemoryManager(private val context: Context) {
     private val gson = Gson()
+    private val fileName = "memory.json"
+
+    private fun getMemoryFile(): File {
+        return File(context.filesDir, fileName)
+    }
 
     fun loadMemory(): MutableList<MemoryEntry> {
-        val file = File(filePath)
+        val file = getMemoryFile()
         if (!file.exists()) return mutableListOf()
 
         val json = file.readText()
@@ -34,7 +39,7 @@ class MemoryManager(private val filePath: String = "memory.json") {
 
     fun saveMemory(history: List<MemoryEntry>) {
         val json = gson.toJson(history)
-        File(filePath).writeText(json)
+        getMemoryFile().writeText(json)
     }
 
     fun searchByCategory(category: String): List<MemoryEntry> {

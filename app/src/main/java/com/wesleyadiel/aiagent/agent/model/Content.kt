@@ -13,11 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wesleyadiel.aiagent.model
+package com.wesleyadiel.aiagent.agent.model
 
-data class MemoryEntry(
-    val user: String,
-    val assistant: String,
-    val category: String,
-    val deadline: String? = null
+data class Content(
+    val parts: List<Part>,
 )

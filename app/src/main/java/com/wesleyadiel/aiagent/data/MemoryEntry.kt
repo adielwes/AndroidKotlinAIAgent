@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wesleyadiel.aiagent.model
+package com.wesleyadiel.aiagent.data
 
-data class GeminiRequest(
-    val contents: List<Message>,
+data class MemoryEntry(
+    val user: String,
+    val assistant: String,
+    val category: String,
+    val deadline: String? = null,
 )
