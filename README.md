@@ -15,9 +15,34 @@ An AI agent is an entity that:
 2. **Processes** that perception to make decisions
 3. **Acts** based on those decisions to perform useful tasks
 
-In this project, the agent is presented through a Jetpack Compose-based UI, allowing users to
-interact via natural language input. It uses a generative LLM to interpret user commands and
-provides intelligent, contextual responses in real time.
+---
+
+## 🤖 How this project implements an AI Agent
+
+In this project, the agent is embodied as a **conversational assistant** with a modern
+Jetpack Compose UI, allowing users to interact through natural language. Behind the scenes,
+the agent follows the same classic cycle:
+
+- **Perception**  
+  The user enters a message via the UI. This input is captured and sent to the agent for processing.  
+  → *This corresponds to the text field and input event in the Compose interface.*
+
+- **Reasoning**  
+  The message is analyzed by a generative LLM (Gemini), which:
+  - Understands the intent
+  - Classifies the message (as Task, Reminder, Idea, Feeling, or Other)
+  - Extracts any time-related expressions (e.g. "tomorrow at 3pm")  
+    → *This is the core intelligence powered by the LLM and a custom logic.*
+
+- **Action**  
+  Based on the reasoning, the agent:
+  - Responds to the user with a contextual reply
+  - Saves the interaction (message, response, category, and optional deadline)
+  - May schedule notifications or calendar events (in future versions)  
+    → *These actions are the agent's effect on the world — even if that “world” is local, for now.*
+
+This structure makes the agent not only reactive, but extendable — ready for deeper memory,
+planning, and real-world integrations like reminders and task automation.
 
 ---
 
