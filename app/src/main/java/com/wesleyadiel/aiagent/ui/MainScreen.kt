@@ -15,20 +15,25 @@
  */
 package com.wesleyadiel.aiagent.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -51,8 +56,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun mainScreen(agent: Agent) {
-    var input by remember { mutableStateOf("") }
+    var inputState by remember { mutableStateOf("") }
     val messages = remember { mutableStateListOf<MessageEntry>() }
+    val isLoading = remember { mutableStateOf(false) }
+
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
@@ -73,6 +80,7 @@ fun mainScreen(agent: Agent) {
                 Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
+                    .padding(16.dp)
                     .imePadding(),
         ) {
             LazyColumn(
@@ -89,10 +97,17 @@ fun mainScreen(agent: Agent) {
                         modifier =
                             Modifier
                                 .fillMaxWidth()
+                                .padding(horizontal = 8.dp)
                                 .background(Color.LightGray),
                     ) {
-                        Text(text = "You: ${message.user}")
-                        Text(text = "Agent: ${message.assistant}")
+                        Text(
+                            text = "You: ${message.user}",
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Text(
+                            text = "Agent: ${message.assistant}",
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }
@@ -100,34 +115,56 @@ fun mainScreen(agent: Agent) {
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = input,
-                onValueChange = { input = it },
+                value = inputState,
+                onValueChange = { inputState = it },
                 label = { Text("Type your message...") },
                 modifier =
                     Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp),
                 singleLine = true,
+                enabled = !isLoading.value
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Button(
-                onClick = {
-                    if (input.isNotBlank()) {
-                        scope.launch {
-                            val response = agent.handleInput(input)
-                            messages.add(MessageEntry(input, response))
-                            input = ""
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AnimatedContent(
+                    targetState = isLoading.value,
+                    label = "SendButtonAnimation"
+                ) { loading ->
+                    if (loading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    } else {
+                        Button(
+                            onClick = {
+                                val input = inputState
+                                if (input.isNotBlank()) {
+                                    isLoading.value = true
+                                    scope.launch {
+                                        val response = agent.handleInput(input)
+                                        messages.add(MessageEntry(input, response))
+                                        inputState = ""
+                                        isLoading.value = false
+                                        listState.animateScrollToItem(messages.size)
+                                    }
+                                }
+                            },
+                            enabled = !isLoading.value
+                        ) {
+                            Text("Send")
                         }
                     }
-                },
-                modifier =
-                    Modifier
-                        .padding(horizontal = 8.dp)
-                        .align(Alignment.End),
-            ) {
-                Text("Send")
+                }
             }
         }
     }

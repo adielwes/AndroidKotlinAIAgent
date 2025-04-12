@@ -29,6 +29,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        actionBar?.hide()
+
         val gemini = GeminiClient(BuildConfig.GEMINI_API_KEY)
         val memoryManager = MemoryManager(this)
         val agent = Agent(gemini, memoryManager)
