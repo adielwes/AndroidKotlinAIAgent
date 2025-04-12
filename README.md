@@ -1,9 +1,9 @@
 # 🤖 Personal Agent with LLM (Gemini) – Kotlin
 
 This is a Kotlin-based experiment to build an **intelligent personal agent** capable of
-interpreting natural language and making decisions based on user input. This initial
-version focuses on **text-based interaction with a generative language model (LLM)**
-using Google’s **Gemini API**.
+interpreting natural language and making decisions based on user input.  The current version
+features a modern Jetpack Compose UI, enabling intuitive message interaction, memory persistence,
+and message classification—all running locally on the device.
 
 ---
 
@@ -15,8 +15,9 @@ An AI agent is an entity that:
 2. **Processes** that perception to make decisions
 3. **Acts** based on those decisions to perform useful tasks
 
-In this project, the agent is **a console-based program** that interacts with the user through text,
-uses an LLM to interpret commands, and returns smart responses.
+In this project, the agent is presented through a Jetpack Compose-based UI, allowing users to
+interact via natural language input. It uses a generative LLM to interpret user commands and
+provides intelligent, contextual responses in real time.
 
 ---
 
